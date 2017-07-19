@@ -15,7 +15,7 @@
 {"name":"Flevum L.","type":"hg:Water","uri":"http://pleiades.stoa.org/places/98958/Flevum-L","geometry":{"type":"Point","coordinates":[5.3596545,52.4773036]},"data":{"geoContext":"IJssel","featureType":"lake"}}
 {"name":"Grinnes","type":"hg:Place","uri":"http://pleiades.stoa.org/places/98967/grinnes","geometry":{"type":"Point","coordinates":[5.350798,51.799752]},"data":{"geoContext":"Rossum","featureType":"fort"}}
 {"name":"Laurum","type":"hg:Place","uri":"http://pleiades.stoa.org/places/98997/laurum","geometry":{"type":"Point","coordinates":[4.882672,52.085664]},"data":{"geoContext":"Woerden","featureType":"fort"}}
-{"name":"Lugdunum","type":"hg:Place","uri":"http://pleiades.stoa.org/places/99003/lugdunum","geometry":{"type":"Point","coordinates":[4393,52212]},"data":{"geoContext":"Katwijk","featureType":"fort"}}
+{"name":"Lugdunum","type":"hg:Place","uri":"http://pleiades.stoa.org/places/99003/lugdunum","geometry":{"type":"Point","coordinates":[4.393,52.212]},"data":{"geoContext":"Katwijk","featureType":"fort"}}
 {"name":"Mannaricium","type":"hg:Place","uri":"http://pleiades.stoa.org/places/99006/mannaricium","geometry":{"type":"Point","coordinates":[5.4240495,51.9662405]},"data":{"geoContext":"Maurik","featureType":"fort"}}
 {"name":"Matilo","type":"hg:Place","uri":"http://pleiades.stoa.org/places/99008/matilo","geometry":{"type":"Point","coordinates":[4.518428,52.150265]},"data":{"geoContext":"Leiden","featureType":"fort"}}
 {"name":"Zwammerdam","type":"hg:Place","uri":"http://pleiades.stoa.org/places/99014/zwammerdam","geometry":{"type":"Point","coordinates":[4.727222,52.105833]},"data":{"geoContext":"Zwammerdam","featureType":"fort"}}
@@ -44,7 +44,7 @@
 {"name":"Tongeren","type":"hg:Place","uri":"http://pleiades.stoa.org/places/108765/tongeren","geometry":{"type":"Point","coordinates":[5.464831,50.780857]},"data":{"geoContext":"Tongres BGM","featureType":"settlement, temple"}}
 {"name":"Tongres","type":"hg:Place","uri":"http://pleiades.stoa.org/places/108765/tongres","geometry":{"type":"Point","coordinates":[5.464831,50.780857]},"data":{"geoContext":"Tongres BGM","featureType":"settlement, temple"}}
 {"name":"Tongeren","type":"hg:Place","uri":"http://pleiades.stoa.org/places/108765/copy_of_tongeren","geometry":{"type":"Point","coordinates":[5.464831,50.780857]},"data":{"geoContext":"Tongres BGM","featureType":"settlement, temple"}}
-{"name":"Blariacum","type":"hg:Place","uri":"http://pleiades.stoa.org/places/108811/blariacum","geometry":{"type":"Point","coordinates":[6148,51.362853]},"data":{"geoContext":"Blerick NET","featureType":"settlement"}}
+{"name":"Blariacum","type":"hg:Place","uri":"http://pleiades.stoa.org/places/108811/blariacum","geometry":{"type":"Point","coordinates":[6.148,51.362853]},"data":{"geoContext":"Blerick NET","featureType":"settlement"}}
 {"name":"Caesia Silva","type":"hg:Area","uri":"http://pleiades.stoa.org/places/108845/caesia-silva","geometry":{"type":"Point","coordinates":[6.9874365,51.4025827]},"data":{"geoContext":"Heissi-Wald GER","featureType":"forest"}}
 {"name":"Castellum Divitia","type":"hg:Place","uri":"http://pleiades.stoa.org/places/108863/castellum-divitia","geometry":{"type":"Point","coordinates":[6.973596,50.9372385]},"data":{"geoContext":"K\u00f6ln-Deutz GER","featureType":"fort"}}
 {"name":"Birten","type":"hg:Place","uri":"http://pleiades.stoa.org/places/108867/birten","geometry":{"type":"Point","coordinates":[6.469989,51.646389]},"data":{"geoContext":"Xanten GER","featureType":"amphitheatre, fort"}}

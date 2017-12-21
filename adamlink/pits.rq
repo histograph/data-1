@@ -1,0 +1,45 @@
+prefix hg:     <http://rdf.histograph.io/>
+prefix gg:     <http://www.gemeentegeschiedenis.nl/gg-schema#>
+prefix owl:    <http://www.w3.org/2002/07/owl#>
+prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+prefix skos:   <http://www.w3.org/2004/02/skos/core#>
+prefix sem:    <http://semanticweb.cs.vu.nl/2009/11/sem/>
+prefix xsd:    <http://www.w3.org/2001/XMLSchema#>
+prefix geo:    <http://www.opengis.net/ont/geosparql#>
+prefix schema: <https://schema.org/>
+prefix dcterms:<http://purl.org/dc/terms/>
+
+
+# select  ?id ?type ?name ?altName ?geometry ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd
+
+select  ?id ?type ?name ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd 
+        ?altName ?earliestAltBegin ?latestAltBegin ?earliestAltEnd ?latestAltEnd 
+        ?geometry ?earliestGeoBegin ?latestGeoBegin ?earliestGeoEnd ?latestGeoEnd
+
+where {
+    ?id rdf:type ?type;
+            rdfs:label ?name;
+            schema:name ?schema.
+            FILTER (?type != skos:Concept)
+            # FILTER (?id = <https://adamlink.nl/geo/street/van-ostadestraat/4689>)
+            OPTIONAL {?id geo:hasGeometry ?geoObj.
+                        ?geoObj geo:asWKT ?geometry.
+                        OPTIONAL {?geoObj sem:hasEarliestBeginTimeStamp ?earliestGeoBegin}
+                        OPTIONAL {?geoObj sem:hasLatestBeginTimeStamp ?latestGeoBegin}
+                        OPTIONAL {?geoObj sem:hasEarliestEndTimeStamp ?earliestGeoEnd}
+                        OPTIONAL {?geoObj sem:hasLatestEndTimeStamp ?latestGeoEnd}
+                        }  
+
+            OPTIONAL {?id sem:hasEarliestBeginTimeStamp ?earliestBegin}
+            OPTIONAL {?id sem:hasLatestBeginTimeStamp ?latestBegin}
+            OPTIONAL {?id sem:hasEarliestEndTimeStamp ?earliestEnd}
+            OPTIONAL {?id sem:hasLatestEndTimeStamp ?latestEnd}
+
+    ?schema rdfs:label ?altName;
+    OPTIONAL {?schema sem:hasEarliestBeginTimeStamp ?earliestAltBegin}
+    OPTIONAL {?schema sem:hasLatestBeginTimeStamp ?latestAltBegin}
+    OPTIONAL {?schema sem:hasEarliestEndTimeStamp ?earliestAltEnd}
+    OPTIONAL {?schema sem:hasLatestEndTimeStamp ?latestAltEnd}
+            
+}

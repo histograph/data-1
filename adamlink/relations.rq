@@ -1,0 +1,33 @@
+prefix hg:     <http://rdf.histograph.io/>
+prefix gg:     <http://www.gemeentegeschiedenis.nl/gg-schema#>
+prefix owl:    <http://www.w3.org/2002/07/owl#>
+prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+prefix skos:   <http://www.w3.org/2004/02/skos/core#>
+prefix sem:    <http://semanticweb.cs.vu.nl/2009/11/sem/>
+prefix xsd:    <http://www.w3.org/2001/XMLSchema#>
+prefix geo:    <http://www.opengis.net/ont/geosparql#>
+prefix schema: <https://schema.org/>
+prefix dcterms:<http://purl.org/dc/terms/>
+
+
+select ?id ?label ?bag_uri ?wikipedia_uri ?liesInBag ?liesInGem ?absorbed ?absorbedBy ?originated ?originatedBy ?hasPart ?isPartOf
+#select ?id  ?geometry
+where {
+   ?id rdf:type ?type;
+            rdfs:label ?label.
+            FILTER (?type != skos:Concept)
+#    FILTER (?id = <https://adamlink.nl/geo/street/prins-hendrikkade/3680>)
+   OPTIONAL {?id owl:sameAs ?bag_uri. FILTER regex(str(?bag_uri), "^http://bag" ) }
+   OPTIONAL {?id owl:sameAs ?wikipedia_uri. FILTER regex(str(?wikipedia_uri), "http://www.wikidata.org" ) }
+   OPTIONAL {?id hg:liesIn ?liesInBag. FILTER regex(str(?liesInBag), "^http://bag" ) }
+   OPTIONAL {?id hg:liesIn ?liesInGem. FILTER regex(str(?liesInGem), "^http://www.gemeentegeschiedenis.nl" ) }
+   OPTIONAL {?id gg:absorbed ?absorbed}
+   OPTIONAL {?id gg:absorbedBy ?absorbedBy}
+   OPTIONAL {?id gg:originated ?originated}
+   OPTIONAL {?id gg:originatedBy ?originatedBy}
+   OPTIONAL {?id dcterms:hasPart ?hasPart}
+   OPTIONAL {?id dcterms:isPartOf ?isPartOf}
+
+                             
+}

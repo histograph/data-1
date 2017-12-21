@@ -1,0 +1,25 @@
+prefix hg:     <http://rdf.histograph.io/>
+prefix gg:     <http://www.gemeentegeschiedenis.nl/gg-schema#>
+prefix owl:    <http://www.w3.org/2002/07/owl#>
+prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+prefix skos:   <http://www.w3.org/2004/02/skos/core#>
+prefix sem:    <http://semanticweb.cs.vu.nl/2009/11/sem/>
+prefix xsd:    <http://www.w3.org/2001/XMLSchema#>
+prefix geo:    <http://www.opengis.net/ont/geosparql#>
+prefix schema: <https://schema.org/>
+prefix dcterms:<http://purl.org/dc/terms/>
+
+select  ?id 
+# select  ?id ?type ?name ?altName ?geometry ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd
+where {
+    ?id rdf:type ?type;
+            rdfs:label ?name;
+            schema:name ?schema.
+            ?schema rdfs:label ?name.
+            FILTER (?type != skos:Concept)
+            # FILTER (?id = <https://adamlink.nl/geo/street/van-ostadestraat/4689>)
+            FILTER EXISTS {?id sem:hasEarliestBeginTimeStamp ?time}
+            FILTER EXISTS {?schema sem:hasEarliestBeginTimeStamp ?time}
+            
+}

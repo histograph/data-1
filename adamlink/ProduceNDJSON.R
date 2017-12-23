@@ -20,19 +20,24 @@ putMsg <- function(msg1,msg2){
 }
 
 clearGeoJSON <- function(value){
-  
-  # remove quoted "
-  new_value <- gsub('\\\\"','"',toJSON(value))
-  
+
   # remove quotes for numbers
-  new_value <- gsub('"([0-9])',"\\1",new_value)
+  new_value <- gsub('"([0-9])',"\\1",value)
   new_value <- gsub('([0-9])",([0-9])',"\\1,\\2",new_value)
   new_value <- gsub('([0-9])"\\]',"\\1\\]",new_value)
   
+  return(new_value)
+}
+
+clearJSON <- function(value){
   # remove quoted object
+  new_value <- toJSON(value)
   new_value <- gsub('"geometry":"\\{','"geometry":\\{',new_value)
   
   new_value <- gsub('\\}"\\}','\\}\\}',new_value)
+  
+  # remove quoted "
+  new_value <- gsub('\\\\"','"',new_value)
   
   # insert new line
   new_value <- gsub('\\},\\{','\\}\n\\{',new_value)
@@ -57,15 +62,17 @@ if ( sum(duplicated(pits)) > 0 ){
 }
 
 pits <-unique(data.table(pits,key="id"))
+# pits <- pits[1:100,]
 
 # replace url with namespace
 pits$type <- gsub("http://rdf.histograph.io/","hg:",pits$type)
 
-a <- lapply(pits$geometry[!is.na(pits$geometry)],wkt2geojson)
-b <- lapply(a,function(b){toJSON(b$geometry)})
-pits$geometry[!is.na(pits$geometry)] <- as.character(b)
+geoJsonGeo <- lapply(pits$geometry[!is.na(pits$geometry)],wkt2geojson)
+jsonGeo <- lapply(geoJsonGeo,function(b){toJSON(b$geometry)})
 
-  
+pits$geometry[!is.na(pits$geometry)] <- sapply(jsonGeo,clearGeoJSON)
+
+
 # Handle missing time
 startYear <- -33
 
@@ -292,9 +299,6 @@ allPits$latestBegin[allPits$latestBegin == startYear] <- NA
 allPits$earliestEnd[allPits$earliestEnd == endYear] <- NA
 allPits$latestEnd[allPits$latestEnd == endYear] <- NA
 
-allSameAsRelations <- rbind(altNamesRelations,geoRelations)
-
-
 
 #############################################################
 #### RELATIONS
@@ -303,17 +307,54 @@ relations <- read.csv("./relations.csv",stringsAsFactors = FALSE, na.strings =""
 
 relations <-data.table(relations,key="id")
 
-relationNames <- colnames(relations)[3:ncol(relations)]
+# create hg:sameHgConcept relations 
+bagsameAs <- data.table(from=relations$id[!is.na(relations$bag_uri)],
+                           to=relations$bag_uri[!is.na(relations$bag_uri)], type=rep("hg:sameHgConcept",length(relations$id[!is.na(relations$bag_uri)])))
 
-looseTables <- lapply(relationNames, disJoinCol, c("id","label"),relations)
+wikipediasameAs <- data.table(from=relations$id[!is.na(relations$wikipedia_uri)],
+                           to=relations$wikipedia_uri[!is.na(relations$wikipedia_uri)], type=rep("hg:sameHgConcept",length(relations$id[!is.na(relations$wikipedia_uri)])))
 
-totalRelations <- rbindlist(looseTables,use.names = TRUE, fill = TRUE)                       
+bagLiesIn <- data.table(from=relations$id[!is.na(relations$liesInBag)],
+                              to=relations$liesInBag[!is.na(relations$liesInBag)], type=rep("hg:liesIn",length(relations$id[!is.na(relations$liesInBag)])))
 
+gemLiesIn <- data.table(from=relations$id[!is.na(relations$liesInGem)],
+                        to=relations$liesInGem[!is.na(relations$liesInGem)], type=rep("hg:liesIn",length(relations$id[!is.na(relations$liesInGem)])))
 
+absorbRel <- data.table(from=relations$id[!is.na(relations$absorbed)],
+                        to=relations$absorbed[!is.na(relations$absorbed)], type=rep("hg:absorbed",length(relations$id[!is.na(relations$absorbed)])))
+
+absorbByRel <- data.table(from=relations$id[!is.na(relations$absorbedBy)],
+                        to=relations$absorbedBy[!is.na(relations$absorbedBy)], type=rep("hg:absorbedBy",length(relations$id[!is.na(relations$absorbedBy)])))
+
+originatedRel <- data.table(from=relations$id[!is.na(relations$originated)],
+                          to=relations$originated[!is.na(relations$originated)], type=rep("hg:originated",length(relations$id[!is.na(relations$originated)])))
+
+originatedByRel <- data.table(from=relations$id[!is.na(relations$originatedBy)],
+                         to=relations$originatedBy[!is.na(relations$originatedBy)], type=rep("hg:originatedBy",length(relations$id[!is.na(relations$originatedBy)])))
+
+hasPartRel <- data.table(from=relations$id[!is.na(relations$hasPart)],
+                              to=relations$hasPart[!is.na(relations$hasPart)], type=rep("hg:containsHgConcept",length(relations$id[!is.na(relations$hasPart)])))
+
+isPartOfRel <- data.table(from=relations$id[!is.na(relations$isPartOf)],
+                         to=relations$isPartOf[!is.na(relations$isPartOf)], type=rep("hg:withinHgConcept",length(relations$id[!is.na(relations$isPartOf)])))
+
+allSameAsRelations <- rbind(altNamesRelations,
+                            geoRelations,
+                            bagsameAs,
+                            wikipediasameAs,
+                            bagLiesIn,
+                            gemLiesIn,
+                            absorbRel,
+                            absorbByRel,
+                            originatedRel,
+                            originatedByRel,
+                            hasPartRel,
+                            isPartOfRel
+                            )
 #############################################################
 #### GENERATE FILES
 #############################################################
 
-cat(clearGeoJSON(allPits),file="adamlinkstraten.pits.ndjson",sep="")
+cat(clearJSON(allPits),file="adamlinkstraten.pits.ndjson",sep="")
 
-cat(gsub('\\},\\{','\\}\n\\{',toJSON(allSameAsRelations)),file="adamlinkstraten.relations.ndjson",sep="")
+cat(clearJSON(allSameAsRelations),file="adamlinkstraten.relations.ndjson",sep="")

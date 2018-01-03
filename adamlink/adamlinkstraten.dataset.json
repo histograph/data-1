@@ -1,0 +1,11 @@
+{
+  "id": "adamlinkstraten",
+  "edits": "De oorspronkelijk ttl file (https://adamlink.nl/data/rdf/streets) is met een R script vertaald naar ndjson files door Stefano Bocconi, script op https://github.com/histograph/e_l_data/tree/puppetdeploy/adamlink",
+  "description": "De referentiedata voor Amsterdamse straten, gebouwen, wijken en personen worden samengesteld uit verschillende bronnen, waarop zo goed mogelijk redactie wordt gevoerd. Het project is eind 2017 van start gegaan, de data zal regelmatig aangevuld worden. De data is in ontwikkeling",
+  "creationDate": "2017",
+  "author": "Stichting AdamNet (http://www.adamnet.nl/)",
+  "website": "https://adamlink.nl/",
+  "editor": "Menno den Engelse, Stefano Bocconi",
+  "license": "licentie nog onbekend",
+  "title": "Amsterdamse straten"
+}

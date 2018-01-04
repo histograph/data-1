@@ -25,6 +25,9 @@ clearGeoJSON <- function(value) {
   new_value <- gsub('([0-9])",([0-9])', "\\1,\\2", new_value)
   new_value <- gsub('([0-9])"\\]', "\\1\\]", new_value)
   
+  new_value <- gsub('"type":\\["', '"type":"', new_value)
+  new_value <- gsub('"\\],"coordinates"', '","coordinates"', new_value)
+  
   return(new_value)
 }
 
@@ -656,7 +659,7 @@ gemLiesIn <-
     type = rep("hg:liesIn", sum(indx))
   )
 
-indx <- !is.na(relations$liesInGem)
+indx <- !is.na(relations$absorbed)
 absorbRel <-
   data.table(
     from = relations$id[indx],
@@ -664,7 +667,7 @@ absorbRel <-
     type = rep("hg:absorbed", sum(indx))
   )
 
-indx <- !is.na(relations$liesInGem)
+indx <- !is.na(relations$absorbedBy)
 absorbByRel <-
   data.table(
     from = relations$id[indx],
@@ -718,6 +721,9 @@ allSameAsRelations <- rbind(
   hasPartRel,
   isPartOfRel
 )
+
+# remove relation without a target
+#allSameAsRelations <- allSameAsRelations[!is.na(to),]
 ###################################################################################################
 #### GENERATE FILES
 ###################################################################################################

@@ -53,19 +53,19 @@ clearJSON <- function(value) {
 }
 
 canNames <- function(){
-  return(c("id","name","type","earliestBegin","latestBegin","earliestEnd","latestEnd","geometry"))
+  return(c("uri","name","type","earliestBegin","latestBegin","earliestEnd","latestEnd","geometry"))
 }
 
 altNames <- function(){
-  return(c("id","altName","type","earliestAltBegin","latestAltBegin","earliestAltEnd","latestAltEnd","geometry"))
+  return(c("uri","altName","type","earliestAltBegin","latestAltBegin","earliestAltEnd","latestAltEnd","geometry"))
 }
 
 geoNames <- function(){
-  return(c("id","name","type","earliestGeoBegin","latestGeoBegin","earliestGeoEnd","latestGeoEnd","geometry"))
+  return(c("uri","name","type","earliestGeoBegin","latestGeoBegin","earliestGeoEnd","latestGeoEnd","geometry"))
 }
 
-bagIDs <- function(id){
-  return(gsub(pattern = "http://bag.basisregistraties.overheid.nl/bag/id/openbare-ruimte/0([0-9]+)","bag/\\1",id))
+bagIDs <- function(uri){
+  return(gsub(pattern = "http://bag.basisregistraties.overheid.nl/bag/id/openbare-ruimte/0([0-9]+)","bag/\\1",uri))
 }
 
 #############################################################
@@ -82,11 +82,11 @@ pits <-
   )
 
 if (sum(duplicated(pits)) > 0) {
-  putMsg("The following id have duplicates:" , paste(pits[which(duplicated(pits)), ]$id, sep =
+  putMsg("The following uri have duplicates:" , paste(pits[which(duplicated(pits)), ]$uri, sep =
                                                        ""))
 }
 
-pits <- unique(data.table(pits, key = "id"))
+pits <- unique(data.table(pits, key = "uri"))
 # pits <- pits[1:100,]
 
 # replace url with namespace
@@ -145,7 +145,7 @@ if (nrow(diffTimeRange) > 0)
 {
   putMsg(
     "There are pits where the main name variant (same name as the main object) has a different time range:" ,
-    paste(diffTimeRange$id, sep = "")
+    paste(diffTimeRange$uri, sep = "")
   )
 }
 
@@ -208,9 +208,9 @@ stopifnot (
   nrow(sameAsPits_M_ne_A) + nrow(Pits_M_e_A_Tm_ne_Ta) + nrow(Pits_M_e_A_Tm_e_Ta) - nrow(pits) == 0
 )
 
-onlyAltIds <- unique(sameAsPits_M_ne_A$id[!(
-  (sameAsPits_M_ne_A$id %in% Pits_M_e_A_Tm_e_Ta$id) |
-    (sameAsPits_M_ne_A$id %in% Pits_M_e_A_Tm_ne_Ta$id)
+onlyAltIds <- unique(sameAsPits_M_ne_A$uri[!(
+  (sameAsPits_M_ne_A$uri %in% Pits_M_e_A_Tm_e_Ta$uri) |
+    (sameAsPits_M_ne_A$uri %in% Pits_M_e_A_Tm_ne_Ta$uri)
 )])
 
 if (length(onlyAltIds) > 0)
@@ -512,14 +512,17 @@ allAltNames <-
     sameAsPits_M_ne_A_Ta_ne_Tg
   )
 
-moreGeos <- unique(allAltNames$id[duplicated(allAltNames[,-"geometry"])])
+#keep order consistent
+setkey(allAltNames,uri,name)
+
+moreGeos <- unique(allAltNames$uri[duplicated(allAltNames[,-"geometry"])])
 
 if( length(moreGeos) > 0 ){
   putMsg(
-    "There are sameAs pits that differ only in geometry:" ,
+    "There are sameAs pits that differ only in geometry, we only consider the first one:" ,
     paste(moreGeos, sep = "")
   )
-  allAltNames <- allAltNames[! id %in% moreGeos,]
+  allAltNames <- allAltNames[! uri %in% moreGeos,]
 }
 
 # pits that derive from geometries not overlapping with the main pit
@@ -527,85 +530,88 @@ allGeometries <-
   rbind(sameAsPits_M_e_A_Tm_e_Ta_Tm_ne_Tg,
         sameAsPits_M_e_A_Tm_ne_Ta_Tm_ne_Tg)
 
-moreGeos <- unique(allGeometries$id[duplicated(allGeometries[,-"geometry"])])
+#keep order consistent
+setkey(allGeometries,uri,name)
+
+moreGeos <- unique(allGeometries$uri[duplicated(allGeometries[,-"geometry"])])
 
 if( length(moreGeos) > 0 ){
   putMsg(
-    "There are sameAs pits that differ only in geometry:" ,
+    "There are sameAs pits that differ only in geometry, we only consider the first one:" ,
     paste(moreGeos, sep = "")
   )
-  allGeometries <- allGeometries[! id %in% moreGeos,]
+  allGeometries <- allGeometries[! uri %in% moreGeos,]
 }
 
 # main pits with geometries
 allGeoMainPits <-
   rbind(Pits_M_e_A_Tm_e_Ta_Tm_e_Tg, Pits_M_e_A_Tm_ne_Ta_Tm_e_Tg)
 
-moreGeos <- unique(allGeoMainPits$id[duplicated(allGeoMainPits$id)])
+moreGeos <- unique(allGeoMainPits$uri[duplicated(allGeoMainPits$uri)])
 
 if( length(moreGeos) >0 ){
   putMsg(
-    "There are pits that differ only in geometry:" ,
+    "There are pits that differ only in geometry, we only consider the first one:" ,
     paste(moreGeos, sep = "")
     )
-  allGeoMainPits <- allGeoMainPits[! id %in% moreGeos,]
+  allGeoMainPits <- allGeoMainPits[! uri %in% moreGeos,]
 }
 
 # remove the ones that are already present
-pitsToAdd <- pitsToAdd[! (id %in% allGeoMainPits$id),]
+pitsToAdd <- pitsToAdd[! (uri %in% allGeoMainPits$uri),]
 
 # main pits
 allMainPits <-  rbind(allGeoMainPits, pitsToAdd)
 
-stopifnot(sum(duplicated(allMainPits$id)) == 0)
+stopifnot(sum(duplicated(allMainPits$uri)) == 0)
 
-stopifnot(sum(!(allAltNames$id %in% allMainPits$id)) == 0)
+stopifnot(sum(!(allAltNames$uri %in% allMainPits$uri)) == 0)
 
-stopifnot(sum(!(allGeometries$id %in% allMainPits$id)) == 0)
+stopifnot(sum(!(allGeometries$uri %in% allMainPits$uri)) == 0)
 
-# Create new ids for Alt names
+# Create new uris for Alt names
 sameAsAltPits <-
-  data.table(allAltNames[, paste(id, "altName", seq_len(.N), sep = "_"), by=id]$V1,
+  data.table(allAltNames[, paste(uri, "altName", seq_len(.N), sep = "_"), by=uri]$V1,
              allAltNames,
-             key = "id",
+             key = "uri",
              stringsAsFactors = FALSE)
 
 # create hg:sameHgConcept relations
 altNamesRelations <-
   data.table(
     from = sameAsAltPits$V1,
-    to = sameAsAltPits$id,
-    type = rep("hg:sameHgConcept", length(sameAsAltPits$id))
+    to = sameAsAltPits$uri,
+    type = rep("hg:sameHgConcept", length(sameAsAltPits$uri))
   )
 
-# set new id
-sameAsAltPits[, id := NULL]
-colnames(sameAsAltPits)[1] <- "id"
-setkey(sameAsAltPits, "id")
+# set new uri
+sameAsAltPits[, uri := NULL]
+colnames(sameAsAltPits)[1] <- "uri"
+setkey(sameAsAltPits, "uri")
 
-# Create new ids for Geometries
+# Create new uris for Geometries
 sameAsGeoPits <-
-  data.table(allGeometries[, paste(id, "geo", seq_len(.N), sep = "_"), by=id]$V1,
+  data.table(allGeometries[, paste(uri, "geo", seq_len(.N), sep = "_"), by=uri]$V1,
              allGeometries,
-             key = "id",
+             key = "uri",
              stringsAsFactors = FALSE)
 
 # create hg:sameHgConcept relations
 geoRelations <-
   data.table(
     from = sameAsGeoPits$V1,
-    to = sameAsGeoPits$id,
-    type = rep("hg:sameHgConcept", length(sameAsGeoPits$id))
+    to = sameAsGeoPits$uri,
+    type = rep("hg:sameHgConcept", length(sameAsGeoPits$uri))
   )
 
-# set new id
-sameAsGeoPits[, id := NULL]
-colnames(sameAsGeoPits)[1] <- "id"
-setkey(sameAsGeoPits, "id")
+# set new uri
+sameAsGeoPits[, uri := NULL]
+colnames(sameAsGeoPits)[1] <- "uri"
+setkey(sameAsGeoPits, "uri")
 
 allPits <- rbind(allMainPits, sameAsAltPits, sameAsGeoPits)
 
-stopifnot(sum(duplicated(allPits$id)) == 0)
+stopifnot(sum(duplicated(allPits$uri)) == 0)
 
 # remove artificially created years
 allPits$earliestBegin[allPits$earliestBegin == startYear] <- NA
@@ -613,7 +619,21 @@ allPits$latestBegin[allPits$latestBegin == startYear] <- NA
 allPits$earliestEnd[allPits$earliestEnd == endYear] <- NA
 allPits$latestEnd[allPits$latestEnd == endYear] <- NA
 
-colnames(allPits)[colnames(allPits) == "id"] <- "uri"
+allPits <- data.table(allPits,validSince=as.character(rep(NA,nrow(allPits))),
+                      validUntil=as.character(rep(NA,nrow(allPits))))
+
+allPits[!(is.na(earliestBegin) | is.na(latestBegin)) & !(earliestBegin==latestBegin),validSince:=paste(earliestBegin,latestBegin,sep="-")]
+allPits[!(is.na(earliestBegin) | is.na(latestBegin)) & (earliestBegin==latestBegin),validSince:=as.character(earliestBegin)]
+allPits[!is.na(earliestBegin) & is.na(latestBegin),validSince:=as.character(earliestBegin)]
+allPits[is.na(earliestBegin) & !is.na(latestBegin),validSince:=as.character(latestBegin)]
+
+allPits[!(is.na(earliestEnd) | is.na(latestEnd)) & !(earliestEnd==latestEnd),validUntil:=paste(earliestEnd,latestEnd,sep="-")]
+allPits[!(is.na(earliestEnd) | is.na(latestEnd)) & (earliestEnd==latestEnd),validUntil:=as.character(earliestEnd)]
+allPits[!is.na(earliestEnd) & is.na(latestEnd),validSince:=as.character(earliestEnd)]
+allPits[is.na(earliestEnd) & !is.na(latestEnd),validSince:=as.character(latestEnd)]
+
+allPits[, c("earliestBegin","latestBegin","earliestEnd","latestEnd") := NULL]
+
 ###################################################################################################
 #### RELATIONS
 ###################################################################################################
@@ -622,7 +642,7 @@ relations <-
            stringsAsFactors = FALSE,
            na.strings = "")
 
-relations <- data.table(relations, key = "id")
+relations <- data.table(relations, key = "uri")
 
 relations$bag_uri <- sapply(relations$bag_uri,bagIDs,USE.NAMES=FALSE)
 
@@ -630,7 +650,7 @@ relations$bag_uri <- sapply(relations$bag_uri,bagIDs,USE.NAMES=FALSE)
 indx <- !is.na(relations$bag_uri)
 bagsameAs <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$bag_uri[indx],
     type = rep("hg:sameHgConcept", sum(indx))
   )
@@ -638,7 +658,7 @@ bagsameAs <-
 indx <- !is.na(relations$wikipedia_uri)
 wikipediasameAs <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$wikipedia_uri[indx],
     type = rep("hg:sameHgConcept", sum(indx))
   )
@@ -646,7 +666,7 @@ wikipediasameAs <-
 indx <- !is.na(relations$liesInBag)
 bagLiesIn <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$liesInBag[indx],
     type = rep("hg:liesIn", sum(indx))
   )
@@ -654,7 +674,7 @@ bagLiesIn <-
 indx <- !is.na(relations$liesInGem)
 gemLiesIn <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$liesInGem[indx],
     type = rep("hg:liesIn", sum(indx))
   )
@@ -662,7 +682,7 @@ gemLiesIn <-
 indx <- !is.na(relations$absorbed)
 absorbRel <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$absorbed[indx],
     type = rep("hg:absorbed", sum(indx))
   )
@@ -670,7 +690,7 @@ absorbRel <-
 indx <- !is.na(relations$absorbedBy)
 absorbByRel <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$absorbedBy[indx],
     type = rep("hg:absorbedBy", sum(indx))
   )
@@ -678,7 +698,7 @@ absorbByRel <-
 indx <- !is.na(relations$originated)
 originatedRel <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$originated[indx],
     type = rep("hg:originated", sum(indx))
   )
@@ -686,7 +706,7 @@ originatedRel <-
 indx <- !is.na(relations$originatedBy)
 originatedByRel <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$originatedBy[indx],
     type = rep("hg:originatedBy", sum(indx))
   )
@@ -694,7 +714,7 @@ originatedByRel <-
 indx <- !is.na(relations$hasPart)
 hasPartRel <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$hasPart[indx],
     type = rep("hg:containsHgConcept", sum(indx))
   )
@@ -702,7 +722,7 @@ hasPartRel <-
 indx <- !is.na(relations$isPartOf)
 isPartOfRel <-
   data.table(
-    from = relations$id[indx],
+    from = relations$uri[indx],
     to = relations$isPartOf[indx],
     type = rep("hg:withinHgConcept", sum(indx))
   )

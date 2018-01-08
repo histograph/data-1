@@ -1,5 +1,5 @@
 ARQ_DIR="/Users/SB/Software/apache-jena-3.5.0/bin"
-DATA_DIR="/Users/SB/Software/code/E_L/histograph/e_l_data/adamlink"
+DATA_DIR="/Users/SB/Software/code/E_L/histograph/e_l_data/adamlinkstraten"
 
 
 for i in pits relations;

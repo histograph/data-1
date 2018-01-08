@@ -11,23 +11,23 @@ prefix schema: <https://schema.org/>
 prefix dcterms:<http://purl.org/dc/terms/>
 
 
-select ?id ?label ?bag_uri ?wikipedia_uri ?liesInBag ?liesInGem ?absorbed ?absorbedBy ?originated ?originatedBy ?hasPart ?isPartOf
-#select ?id  ?geometry
+select ?uri ?label ?bag_uri ?wikipedia_uri ?liesInBag ?liesInGem ?absorbed ?absorbedBy ?originated ?originatedBy ?hasPart ?isPartOf
+#select ?uri  ?geometry
 where {
-   ?id rdf:type ?type;
+   ?uri rdf:type ?type;
             rdfs:label ?label.
             FILTER (?type != skos:Concept)
-#    FILTER (?id = <https://adamlink.nl/geo/street/prins-hendrikkade/3680>)
-   OPTIONAL {?id owl:sameAs ?bag_uri. FILTER regex(str(?bag_uri), "^http://bag" ) }
-   OPTIONAL {?id owl:sameAs ?wikipedia_uri. FILTER regex(str(?wikipedia_uri), "http://www.wikidata.org" ) }
-   OPTIONAL {?id hg:liesIn ?liesInBag. FILTER regex(str(?liesInBag), "^http://bag" ) }
-   OPTIONAL {?id hg:liesIn ?liesInGem. FILTER regex(str(?liesInGem), "^http://www.gemeentegeschiedenis.nl" ) }
-   OPTIONAL {?id gg:absorbed ?absorbed}
-   OPTIONAL {?id gg:absorbedBy ?absorbedBy}
-   OPTIONAL {?id gg:originated ?originated}
-   OPTIONAL {?id gg:originatedBy ?originatedBy}
-   OPTIONAL {?id dcterms:hasPart ?hasPart}
-   OPTIONAL {?id dcterms:isPartOf ?isPartOf}
+#    FILTER (?uri = <https://adamlink.nl/geo/street/prins-hendrikkade/3680>)
+   OPTIONAL {?uri owl:sameAs ?bag_uri. FILTER regex(str(?bag_uri), "^http://bag" ) }
+   OPTIONAL {?uri owl:sameAs ?wikipedia_uri. FILTER regex(str(?wikipedia_uri), "http://www.wikidata.org" ) }
+   OPTIONAL {?uri hg:liesIn ?liesInBag. FILTER regex(str(?liesInBag), "^http://bag" ) }
+   OPTIONAL {?uri hg:liesIn ?liesInGem. FILTER regex(str(?liesInGem), "^http://www.gemeentegeschiedenis.nl" ) }
+   OPTIONAL {?uri gg:absorbed ?absorbed}
+   OPTIONAL {?uri gg:absorbedBy ?absorbedBy}
+   OPTIONAL {?uri gg:originated ?originated}
+   OPTIONAL {?uri gg:originatedBy ?originatedBy}
+   OPTIONAL {?uri dcterms:hasPart ?hasPart}
+   OPTIONAL {?uri dcterms:isPartOf ?isPartOf}
 
                              
 }

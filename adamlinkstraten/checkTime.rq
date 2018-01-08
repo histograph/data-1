@@ -10,16 +10,16 @@ prefix geo:    <http://www.opengis.net/ont/geosparql#>
 prefix schema: <https://schema.org/>
 prefix dcterms:<http://purl.org/dc/terms/>
 
-select  ?id 
-# select  ?id ?type ?name ?altName ?geometry ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd
+select  ?uri 
+# select  ?uri ?type ?name ?altName ?geometry ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd
 where {
-    ?id rdf:type ?type;
+    ?uri rdf:type ?type;
             rdfs:label ?name;
             schema:name ?schema.
             ?schema rdfs:label ?name.
             FILTER (?type != skos:Concept)
-            # FILTER (?id = <https://adamlink.nl/geo/street/van-ostadestraat/4689>)
-            FILTER EXISTS {?id sem:hasEarliestBeginTimeStamp ?time}
+            # FILTER (?uri = <https://adamlink.nl/geo/street/van-ostadestraat/4689>)
+            FILTER EXISTS {?uri sem:hasEarliestBeginTimeStamp ?time}
             FILTER EXISTS {?schema sem:hasEarliestBeginTimeStamp ?time}
             
 }

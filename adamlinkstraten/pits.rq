@@ -11,19 +11,19 @@ prefix schema: <https://schema.org/>
 prefix dcterms:<http://purl.org/dc/terms/>
 
 
-# select  ?id ?type ?name ?altName ?geometry ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd
+# select  ?uri ?type ?name ?altName ?geometry ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd
 
-select  ?id ?type ?name ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd 
+select  ?uri ?type ?name ?earliestBegin ?latestBegin ?earliestEnd ?latestEnd 
         ?altName ?earliestAltBegin ?latestAltBegin ?earliestAltEnd ?latestAltEnd 
         ?geometry ?earliestGeoBegin ?latestGeoBegin ?earliestGeoEnd ?latestGeoEnd
 
 where {
-    ?id rdf:type ?type;
+    ?uri rdf:type ?type;
             rdfs:label ?name;
             schema:name ?schema.
             FILTER (?type != skos:Concept)
-            # FILTER (?id = <https://adamlink.nl/geo/street/van-ostadestraat/4689>)
-            OPTIONAL {?id geo:hasGeometry ?geoObj.
+            # FILTER (?uri = <https://adamlink.nl/geo/street/van-ostadestraat/4689>)
+            OPTIONAL {?uri geo:hasGeometry ?geoObj.
                         ?geoObj geo:asWKT ?geometry.
                         OPTIONAL {?geoObj sem:hasEarliestBeginTimeStamp ?earliestGeoBegin}
                         OPTIONAL {?geoObj sem:hasLatestBeginTimeStamp ?latestGeoBegin}
@@ -31,10 +31,10 @@ where {
                         OPTIONAL {?geoObj sem:hasLatestEndTimeStamp ?latestGeoEnd}
                         }  
 
-            OPTIONAL {?id sem:hasEarliestBeginTimeStamp ?earliestBegin}
-            OPTIONAL {?id sem:hasLatestBeginTimeStamp ?latestBegin}
-            OPTIONAL {?id sem:hasEarliestEndTimeStamp ?earliestEnd}
-            OPTIONAL {?id sem:hasLatestEndTimeStamp ?latestEnd}
+            OPTIONAL {?uri sem:hasEarliestBeginTimeStamp ?earliestBegin}
+            OPTIONAL {?uri sem:hasLatestBeginTimeStamp ?latestBegin}
+            OPTIONAL {?uri sem:hasEarliestEndTimeStamp ?earliestEnd}
+            OPTIONAL {?uri sem:hasLatestEndTimeStamp ?latestEnd}
 
     ?schema rdfs:label ?altName;
     OPTIONAL {?schema sem:hasEarliestBeginTimeStamp ?earliestAltBegin}

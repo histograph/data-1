@@ -613,7 +613,7 @@ allPits$latestBegin[allPits$latestBegin == startYear] <- NA
 allPits$earliestEnd[allPits$earliestEnd == endYear] <- NA
 allPits$latestEnd[allPits$latestEnd == endYear] <- NA
 
-
+colnames(allPits)[colnames(allPits) == "id"] <- "uri"
 ###################################################################################################
 #### RELATIONS
 ###################################################################################################

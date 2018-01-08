@@ -634,6 +634,9 @@ allPits[is.na(earliestEnd) & !is.na(latestEnd),validSince:=as.character(latestEn
 
 allPits[, c("earliestBegin","latestBegin","earliestEnd","latestEnd") := NULL]
 
+# order of columns matters because we need to patter-matching clean the generated JSON
+setcolorder(allPits,c("uri","name","type","validSince","validUntil","geometry"))
+
 ###################################################################################################
 #### RELATIONS
 ###################################################################################################

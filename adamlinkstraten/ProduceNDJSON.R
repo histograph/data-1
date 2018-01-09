@@ -5,6 +5,17 @@ library(wellknown)
 #library(rwkt)
 
 #############################################################
+## CONSTANTS
+#############################################################
+TKN_OPEN <- "erewredfsc"
+TKN_CLOSE <- "sgdfehyfdg"
+
+
+TKN_ARR_OPEN <- "UTIYOOYOI"
+TKN_ARR_CLOSE <- "SDGFSGFG"
+TKN_ARR_SEP <-","
+
+#############################################################
 ## FUNCTIONS
 #############################################################
 
@@ -40,6 +51,16 @@ clearJSON <- function(value) {
   
   # remove quoted "
   new_value <- gsub('\\\\"', '"', new_value)
+  
+  # handle integers and ranges in dates
+  
+  new_value <- gsub(paste("\"",TKN_OPEN,sep=""), "",new_value)
+  
+  new_value <- gsub(paste(TKN_CLOSE,"\"",sep=""), "",new_value)
+  
+  new_value <- gsub(paste("\"",TKN_ARR_OPEN,sep=""), "\\[",new_value)
+  
+  new_value <- gsub(paste(TKN_ARR_CLOSE,"\"",sep=""), "\\]",new_value)
   
   # insert new line
   new_value <- gsub('\\},\\{', '\\}\n\\{', new_value)
@@ -257,10 +278,10 @@ Pits_M_e_A_Tm_ne_Ta_Tm_e_Tg <- Pits_M_e_A_Tm_ne_Ta[(
 canNames(),with=FALSE]
 
 sameAsPits_M_e_A_Tm_ne_Ta_Ta_e_Tg <- Pits_M_e_A_Tm_ne_Ta[(
-  earliestBegin == earliestGeoBegin &
-    latestBegin == latestGeoBegin &
-    earliestEnd == earliestGeoEnd &
-    latestEnd == latestGeoEnd
+  earliestAltBegin == earliestGeoBegin &
+    latestAltBegin == latestGeoBegin &
+    earliestAltEnd == earliestGeoEnd &
+    latestAltEnd == latestGeoEnd
 )
 |
   (
@@ -274,11 +295,14 @@ altNames(),with=FALSE]
 # Make column names equal
 names(sameAsPits_M_e_A_Tm_ne_Ta_Ta_e_Tg) <- canNames()
 
+# We do not add the previous ids to pitsToAdd since those ids are for sure already in the main ids.
+
+
 sameAsPits_M_ne_A_Ta_e_Tg <- sameAsPits_M_ne_A[(
-  earliestBegin == earliestGeoBegin &
-    latestBegin == latestGeoBegin &
-    earliestEnd == earliestGeoEnd &
-    latestEnd == latestGeoEnd
+  earliestAltBegin == earliestGeoBegin &
+    latestAltBegin == latestGeoBegin &
+    earliestAltEnd == earliestGeoEnd &
+    latestAltEnd == latestGeoEnd
 )
 |
   (
@@ -294,10 +318,10 @@ names(sameAsPits_M_ne_A_Ta_e_Tg) <- canNames()
 
 # add the main pits that will be referred to with sameAs, we will filter them later for duplicates
 pitsToAdd <- sameAsPits_M_ne_A[(
-  earliestBegin == earliestGeoBegin &
-    latestBegin == latestGeoBegin &
-    earliestEnd == earliestGeoEnd &
-    latestEnd == latestGeoEnd
+  earliestAltBegin == earliestGeoBegin &
+    latestAltBegin == latestGeoBegin &
+    earliestAltEnd == earliestGeoEnd &
+    latestAltEnd == latestGeoEnd
 )
 |
   (
@@ -315,7 +339,7 @@ canNames(),with=FALSE]
 ###################################################################################################
 
 ##
-## Pits with geometry
+## SameAs Pits with geometry
 ##
 sameAsPits_M_e_A_Tm_e_Ta_Tm_ne_Tg <- Pits_M_e_A_Tm_e_Ta[!(
   (
@@ -404,10 +428,10 @@ canNames(),with=FALSE])
 
 sameAsPits_M_e_A_Tm_ne_Ta_Ta_ne_Tg <-  Pits_M_e_A_Tm_ne_Ta[!(
   (
-    earliestBegin == earliestGeoBegin &
-      latestBegin == latestGeoBegin &
-      earliestEnd == earliestGeoEnd &
-      latestEnd == latestGeoEnd
+    earliestAltBegin == earliestGeoBegin &
+      latestAltBegin == latestGeoBegin &
+      earliestAltEnd == earliestGeoEnd &
+      latestAltEnd == latestGeoEnd
   )
   |
     (
@@ -425,12 +449,14 @@ sameAsPits_M_e_A_Tm_ne_Ta_Ta_ne_Tg$geometry <- NA
 # Make column names equal
 names(sameAsPits_M_e_A_Tm_ne_Ta_Ta_ne_Tg) <- canNames()
 
+# We do not add the previous ids to pitsToAdd since those ids are for sure already in the main ids.
+
 sameAsPits_M_ne_A_Ta_ne_Tg <- sameAsPits_M_ne_A[!(
   (
-    earliestBegin == earliestGeoBegin &
-      latestBegin == latestGeoBegin &
-      earliestEnd == earliestGeoEnd &
-      latestEnd == latestGeoEnd
+    earliestAltBegin == earliestGeoBegin &
+      latestAltBegin == latestGeoBegin &
+      earliestAltEnd == earliestGeoEnd &
+      latestAltEnd == latestGeoEnd
   )
   |
     (
@@ -451,10 +477,10 @@ names(sameAsPits_M_ne_A_Ta_ne_Tg) <- canNames()
 # add the main pits that will be referred to with sameAs, we will filter them later for duplicates
 pitsToAdd <- rbind(pitsToAdd,sameAsPits_M_ne_A[!(
   (
-    earliestBegin == earliestGeoBegin &
-      latestBegin == latestGeoBegin &
-      earliestEnd == earliestGeoEnd &
-      latestEnd == latestGeoEnd
+    earliestAltBegin == earliestGeoBegin &
+      latestAltBegin == latestGeoBegin &
+      earliestAltEnd == earliestGeoEnd &
+      latestAltEnd == latestGeoEnd
   )
   |
     (
@@ -619,18 +645,34 @@ allPits$latestBegin[allPits$latestBegin == startYear] <- NA
 allPits$earliestEnd[allPits$earliestEnd == endYear] <- NA
 allPits$latestEnd[allPits$latestEnd == endYear] <- NA
 
+# handle validSince and validUntil
 allPits <- data.table(allPits,validSince=as.character(rep(NA,nrow(allPits))),
                       validUntil=as.character(rep(NA,nrow(allPits))))
 
-allPits[!(is.na(earliestBegin) | is.na(latestBegin)) & !(earliestBegin==latestBegin),validSince:=paste(earliestBegin,latestBegin,sep="-")]
-allPits[!(is.na(earliestBegin) | is.na(latestBegin)) & (earliestBegin==latestBegin),validSince:=as.character(earliestBegin)]
-allPits[!is.na(earliestBegin) & is.na(latestBegin),validSince:=as.character(earliestBegin)]
-allPits[is.na(earliestBegin) & !is.na(latestBegin),validSince:=as.character(latestBegin)]
+allPits[!(is.na(earliestBegin) | is.na(latestBegin)) & !(earliestBegin==latestBegin),
+        validSince:=paste(TKN_ARR_OPEN,earliestBegin,TKN_ARR_SEP,latestBegin,TKN_ARR_CLOSE,sep="")]
 
-allPits[!(is.na(earliestEnd) | is.na(latestEnd)) & !(earliestEnd==latestEnd),validUntil:=paste(earliestEnd,latestEnd,sep="-")]
-allPits[!(is.na(earliestEnd) | is.na(latestEnd)) & (earliestEnd==latestEnd),validUntil:=as.character(earliestEnd)]
-allPits[!is.na(earliestEnd) & is.na(latestEnd),validSince:=as.character(earliestEnd)]
-allPits[is.na(earliestEnd) & !is.na(latestEnd),validSince:=as.character(latestEnd)]
+allPits[!(is.na(earliestBegin) | is.na(latestBegin)) & (earliestBegin==latestBegin),
+        validSince:=paste(TKN_OPEN,earliestBegin,TKN_CLOSE,sep="")]
+
+allPits[!is.na(earliestBegin) & is.na(latestBegin),
+        validSince:=paste(TKN_OPEN,earliestBegin,TKN_CLOSE,sep="")]
+
+allPits[is.na(earliestBegin) & !is.na(latestBegin),
+        validSince:=paste(TKN_OPEN,latestBegin,TKN_CLOSE,sep="")]
+
+allPits[!(is.na(earliestEnd) | is.na(latestEnd)) & !(earliestEnd==latestEnd),
+        validUntil:=paste(TKN_ARR_OPEN,earliestEnd,TKN_ARR_SEP,latestEnd,TKN_ARR_CLOSE,sep="")]
+
+allPits[!(is.na(earliestEnd) | is.na(latestEnd)) & (earliestEnd==latestEnd),
+        validSince:=paste(TKN_OPEN,earliestEnd,TKN_CLOSE,sep="")]
+
+allPits[!is.na(earliestEnd) & is.na(latestEnd),
+        validSince:=paste(TKN_OPEN,earliestEnd,TKN_CLOSE,sep="")]
+
+allPits[is.na(earliestEnd) & !is.na(latestEnd),
+        validSince:=paste(TKN_OPEN,latestEnd,TKN_CLOSE,sep="")]
+
 
 allPits[, c("earliestBegin","latestBegin","earliestEnd","latestEnd") := NULL]
 

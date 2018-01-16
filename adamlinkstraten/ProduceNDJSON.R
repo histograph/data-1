@@ -7,6 +7,15 @@ library(wellknown)
 #############################################################
 ## CONSTANTS
 #############################################################
+
+ans <- readline(prompt="Reduce input[y/N] ? ")
+if( ans == ''){
+  REDUCE <- FALSE
+}else{
+  REDUCE <- TRUE 
+}
+
+
 TKN_OPEN <- "erewredfsc"
 TKN_CLOSE <- "sgdfehyfdg"
 
@@ -108,7 +117,11 @@ if (sum(duplicated(pits)) > 0) {
 }
 
 pits <- unique(data.table(pits, key = "uri"))
-# pits <- pits[1:100,]
+
+if (REDUCE){
+  pits <- pits[uri %in% unique(pits$uri)[1:50],]
+}
+
 
 # replace url with namespace
 pits$type <- gsub("http://rdf.histograph.io/", "hg:", pits$type)
@@ -772,21 +785,28 @@ isPartOfRel <-
     type = rep("hg:withinHgConcept", sum(indx))
   )
 
-allSameAsRelations <- rbind(
-  altNamesRelations,
-  geoRelations,
-  bagsameAs,
-  wikipediasameAs,
-  bagLiesIn,
-  gemLiesIn,
-  absorbRel,
-  absorbByRel,
-  originatedRel,
-  originatedByRel,
-  hasPartRel,
-  isPartOfRel
-)
+if (REDUCE){
+  allSameAsRelations <- rbind(
+    altNamesRelations,
+    geoRelations
+  )
+}else{
 
+  allSameAsRelations <- rbind(
+    altNamesRelations,
+    geoRelations,
+    bagsameAs,
+    wikipediasameAs,
+    bagLiesIn,
+    gemLiesIn,
+    absorbRel,
+    absorbByRel,
+    originatedRel,
+    originatedByRel,
+    hasPartRel,
+    isPartOfRel
+  )
+}
 # remove relation without a target
 #allSameAsRelations <- allSameAsRelations[!is.na(to),]
 ###################################################################################################

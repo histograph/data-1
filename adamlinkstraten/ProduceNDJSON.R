@@ -101,6 +101,8 @@ bagIDs <- function(uri){
 #############################################################
 ## PITS
 #############################################################
+options(digits = 20)
+Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 
 # Read PITS
 pits <-
@@ -130,7 +132,7 @@ pits$type <- gsub("http://rdf.histograph.io/", "hg:", pits$type)
 geoJsonGeo <-
   lapply(pits$geometry[!is.na(pits$geometry)], wkt2geojson)
 jsonGeo <- lapply(geoJsonGeo, function(b) {
-  toJSON(b$geometry)
+  toJSON(b$geometry,digits = NA)
 })
 
 pits$geometry[!is.na(pits$geometry)] <- sapply(jsonGeo, clearGeoJSON)
@@ -702,7 +704,7 @@ relations <-
 
 relations <- data.table(relations, key = "uri")
 
-relations$bag_uri <- sapply(relations$bag_uri,bagIDs,USE.NAMES=FALSE)
+#relations$bag_uri <- sapply(relations$bag_uri,bagIDs,USE.NAMES=FALSE)
 
 # create hg:sameHgConcept relations
 indx <- !is.na(relations$bag_uri)
